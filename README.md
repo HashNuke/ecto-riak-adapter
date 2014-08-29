@@ -1,0 +1,4 @@
+RiakAdapter
+===========
+
+** TODO: Add description **

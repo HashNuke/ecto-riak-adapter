@@ -1,0 +1,3 @@
+%{"decimal": {:package, "0.2.4"},
+  "ecto": {:package, "0.2.3"},
+  "poolboy": {:package, "1.2.1"}}

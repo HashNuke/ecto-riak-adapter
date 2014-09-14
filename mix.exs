@@ -4,7 +4,7 @@ defmodule RiakAdapter.Mixfile do
   def project do
     [app: :riak_adapter,
      version: "0.0.1",
-     elixir: "~> 0.15.1",
+     elixir: "~> 1.0.0",
      deps: deps]
   end
 
@@ -25,9 +25,13 @@ defmodule RiakAdapter.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
+    # full_deps_path = Path.expand Mix.Project.config[:deps_path]
+    # riak_pb_compile_cmd = "./rebar compile skip_deps=true deps_dir=#{inspect full_deps_path}"
     [
       {:ecto, "~> 0.2.3"},
-      {:decimal, "~> 0.2.3"}
+      {:decimal, "~> 0.2.3"},
+      {:riakc, github: "basho/riak-erlang-client"},
+      {:riak_pb, github: "HashNuke/riak_pb", branch: "plugin-fix-for-rebar-2.5.1", override: true}
     ]
   end
 end

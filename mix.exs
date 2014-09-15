@@ -28,8 +28,8 @@ defmodule RiakAdapter.Mixfile do
     # full_deps_path = Path.expand Mix.Project.config[:deps_path]
     # riak_pb_compile_cmd = "./rebar compile skip_deps=true deps_dir=#{inspect full_deps_path}"
     [
-      {:ecto, "~> 0.2.3"},
-      {:decimal, "~> 0.2.3"},
+      {:ecto, "~> 0.2.4"},
+      {:decimal, "~> 0.2.5"},
       {:riakc, github: "basho/riak-erlang-client"},
       {:riak_pb, github: "HashNuke/riak_pb", branch: "plugin-fix-for-rebar-2.5.1", override: true}
     ]

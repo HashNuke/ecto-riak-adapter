@@ -60,7 +60,7 @@ defmodule RiakAdapter do
 
     repo.log(:ping, fn ->
       use_worker(pool, timeout, fn worker ->
-        Worker.create_search_index!(worker, name, timeout)
+        Worker.create_search_index!(worker, name, schema, opts)
       end)
     end)
   end

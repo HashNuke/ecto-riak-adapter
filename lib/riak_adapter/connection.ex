@@ -13,6 +13,12 @@ defmodule RiakAdapter.Connection do
   end
 
 
+  def create_search_index(pid, name, schema, options, timeout) do
+    options = Keyword.merge(options, [timeout: timeout])
+    :riakc_pb_socket.create_search_index(pid, name, schema, options)
+  end
+
+
   def stop(pid) do
     :riakc_pb_socket.stop(pid)
   end

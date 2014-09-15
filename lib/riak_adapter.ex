@@ -54,6 +54,18 @@ defmodule RiakAdapter do
   end
 
 
+  def create_search_index(name) do
+    pool = repo_pool(repo)
+    timeout = opts[:timeout] || @timeout
+
+    repo.log(:ping, fn ->
+      use_worker(pool, timeout, fn worker ->
+        Worker.create_search_index!(worker, name, timeout)
+      end)
+    end)
+  end
+
+
   def ping(repo, opts \\ []) do
     pool = repo_pool(repo)
     timeout = opts[:timeout] || @timeout

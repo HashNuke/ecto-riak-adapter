@@ -96,23 +96,25 @@ defmodule RiakAdapter do
   #   |> preload(repo, query)
   # end
   #
-  #
-  # # lib/riak_adapter.ex:1: warning: undefined behaviour function insert/3 (for behaviour Ecto.Adapter)
-  # def insert(repo, model, opts) do
-  #   module    = model.__struct__
-  #   returning = module.__schema__(:keywords, model)
-  #     |> Enum.filter(fn {_, val} -> val == nil end)
-  #     |> Keyword.keys
-  #
-  #   {sql, params} = SQL.insert(model, returning)
-  #
-  #   case query(repo, sql, params, opts) do
-  #     %Postgrex.Result{rows: [values]} ->
-  #       Enum.zip(returning, Tuple.to_list(values))
-  #     _ ->
-  #       []
-  #   end
-  # end
+
+  # lib/riak_adapter.ex:1: warning: undefined behaviour function insert/3 (for behaviour Ecto.Adapter)
+  def insert(repo, model, opts) do
+    module    = model.__struct__
+    returning = module.__schema__(:keywords, model)
+      |> Enum.filter(fn {_, val} -> val == nil end)
+      |> Keyword.keys
+
+
+
+    {sql, params} = SQL.insert(model, returning)
+
+    # case query(repo, sql, params, opts) do
+    #   %Postgrex.Result{rows: [values]} ->
+    #     Enum.zip(returning, Tuple.to_list(values))
+    #   _ ->
+    #     []
+    # end
+  end
   #
   #
   #
@@ -309,56 +311,4 @@ defmodule RiakAdapter do
   #   :ok
   # end
 
-end
-
-
-
-
-defmodule RiakAdapter.Error do
-  defexception [:message, :riak]
-
-  def message(e) do
-    if kw = e.postgres do
-      msg = "#{kw[:severity]} (#{kw[:code]}): #{kw[:message]}"
-    end
-
-    msg || e.message
-  end
-end
-
-
-defmodule RiakAdapter.Connection do
-  def start_link(opts) do
-    host = format_host(opts[:host])
-    port = opts[:port]
-    new_opts = Keyword.delete(opts, :host) |> Keyword.delete(:port)
-
-    :riakc_pb_socket.start_link(host, port, new_opts)
-  end
-
-
-  def ping(pid, timeout) do
-    :riakc_pb_socket.ping(pid, timeout)
-  end
-
-
-  def stop(pid) do
-    :riakc_pb_socket.stop(pid)
-  end
-
-
-  defp format_host(host) when is_list(host) or is_tuple(host) do
-    host
-  end
-
-  defp format_host(host), do: '#{host}'
-end
-
-
-defmodule Repo do
-  use Ecto.Repo, adapter: RiakAdapter
-
-  def conf do
-    [host: "localhost"]
-  end
 end

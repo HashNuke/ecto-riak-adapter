@@ -20,19 +20,8 @@ defmodule RiakAdapter.Worker do
   end
 
 
-  @spec create_search_index!(pid, String.t)
-  def create_search_index!(worker, name) do
-    create_search_index!(worker, name, "_yz_default", [], @timeout)
-  end
-
-  @spec create_search_index!(pid, String.t, String.t)
-  def create_search_index!(worker, name, schema) do
-    create_search_index!(worker, name, schema, [], @timeout)
-  end
-
-  @spec create_search_index!(pid, String.t, [Keyword], String.t, integer)
   def create_search_index!(worker, name, schema, search_admin_opts, timeout) do
-    case :gen_server.call(worker, {:create_search_index, name, timeout}, timeout) do
+    case :gen_server.call(worker, {:create_search_index, name, schema, search_admin_opts, timeout}, timeout) do
       :pong -> :pong
       {:error, %RiakAdapter.Error{} = err} -> raise err
     end
@@ -82,8 +71,8 @@ defmodule RiakAdapter.Worker do
   end
 
 
-  def handle_call({:create_search_index, name, timeout}, _from, %{conn: conn} = s) do
-    {:reply, RiakAdapter.Connection.create_search_index(conn, timeout), s}
+  def handle_call({:create_search_index, name, schema, search_admin_opts, timeout}, _from, %{conn: conn} = s) do
+    {:reply, RiakAdapter.Connection.create_search_index(conn, name, schema, search_admin_opts), s}
   end
 
 

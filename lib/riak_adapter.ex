@@ -54,7 +54,7 @@ defmodule RiakAdapter do
   end
 
 
-  def create_search_index(name) do
+  def create_search_index(repo, name, schema, opts \\ []) do
     pool = repo_pool(repo)
     timeout = opts[:timeout] || @timeout
 

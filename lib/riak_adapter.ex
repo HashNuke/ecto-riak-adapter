@@ -129,26 +129,27 @@ defmodule RiakAdapter do
   # lib/riak_adapter.ex:1: warning: undefined behaviour function insert/3 (for behaviour Ecto.Adapter)
   def insert(repo, model, opts) do
     module      = model.__struct__
-    primary_key_field = module.__schema__(:primary_key)
     bucket_name = module.__schema__(:source)
+    key_values  = module.__schema__(:keywords, model)
+    primary_key_field = module.__schema__(:primary_key)
     primary_key_value = key_values |> Keyword.get(:id)
-    key_values  = module.__schema__(:keywords, model) |> Keyword.delete(primary_key_field)
+    model_data        = key_values |> Keyword.delete(primary_key_field)
 
     obj_key = case primary_key_value do
       nil -> :undefined
       _   -> primary_key_value
     end
 
-    encoded_data = encode_data(key_values, @default_content_type)
+    encoded_data = encode_data(model_data, @default_content_type)
     {:ok, student} = :riakc_obj.new("students", obj_key, encoded_data, @default_content_type)
 
-    pool = repo_pool(repo)
-    timeout = opts[:timeout] || @timeout
-    repo.log(:ping, fn ->
-      use_worker(pool, timeout, fn worker ->
-        Worker.query!(worker, sql, params, timeout)
-      end)
-    end)
+    # pool = repo_pool(repo)
+    # timeout = opts[:timeout] || @timeout
+    # repo.log(:ping, fn ->
+    #   use_worker(pool, timeout, fn worker ->
+    #     Worker.query!(worker, sql, params, timeout)
+    #   end)
+    # end)
 
 
     # {sql, params} = SQL.insert(model, returning)

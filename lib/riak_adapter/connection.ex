@@ -26,19 +26,22 @@ defmodule RiakAdapter.Connection do
     bucket_name = module.__schema__(:source)
     primary_key_field = module.__schema__(:primary_key)
 
-    obj_key    = primary_key_value(model, primary_key_field)
+    obj_key    = Ecto.Model.primary_key(model) || :undefined
     model_data = map_of_non_virtual_fields(model, primary_key_field)
 
-    encoded_data   = encode_data(model_data, @default_content_type)
+    encoded_data = encode_data(model_data, @default_content_type)
     object = :riakc_obj.new(bucket_name, obj_key, encoded_data, @default_content_type)
     case :riakc_pb_socket.put(pid, object, opts, timeout) do
       :ok ->
-        {:ok, model}
+        return_values = module.__schema__(:keywords, model)
+        { :ok, model }
       {:ok, return_obj} ->
         key = get_key_from_obj(return_obj)
-        {:ok, Map.put(model, primary_key_field, key)}
+        model = Ecto.Model.put_primary_key(model, key)
+        return_values = module.__schema__(:keywords, model)
+        { :ok, return_values }
       {:error, error} ->
-        {:error, error}
+        { :error, error }
     end
   end
 
@@ -69,15 +72,6 @@ defmodule RiakAdapter.Connection do
 
     Map.from_struct(model)
     |> Map.take(non_virtual_field_keys)
-  end
-
-
-  def primary_key_value(model, primary_key_field) do
-    value = Map.get model, primary_key_field
-    case value do
-      nil -> :undefined
-      _   -> value
-    end
   end
 
 

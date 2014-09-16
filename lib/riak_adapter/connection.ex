@@ -37,7 +37,8 @@ defmodule RiakAdapter.Connection do
       {:ok, return_obj} ->
         key = get_key_from_obj(return_obj)
         {:ok, Map.put(model, primary_key_field, key)}
-      {:error, error} -> {:error, error}
+      {:error, error} ->
+        {:error, error}
     end
   end
 

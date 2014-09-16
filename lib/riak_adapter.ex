@@ -52,6 +52,23 @@ defmodule RiakAdapter do
       def create_search_index(name, schema, opts \\ []) do
         RiakAdapter.create_search_index(__MODULE__, name, schema, opts)
       end
+
+      #TODO list search indices
+      #TODO list keys
+      #TODO list buckets
+      #TODO get bucket
+      #TODO fetch type
+      #TODO reset_bucket
+      #TODO reset_bucket_type
+      #TODO set bucket
+      #TODO setbucket type
+      #TODO set search index
+      #TODO delete_search_index
+
+      #TODO create search schema
+      #TODO mapred
+      #TODO update type
+      #TODO modify_type
     end
   end
 
@@ -126,7 +143,6 @@ defmodule RiakAdapter do
   #
 
 
-  # lib/riak_adapter.ex:1: warning: undefined behaviour function insert/3 (for behaviour Ecto.Adapter)
   def insert(repo, model, opts) do
     pool = repo_pool(repo)
 
@@ -139,9 +155,8 @@ defmodule RiakAdapter do
       end)
     end)
   end
-  #
-  #
-  #
+
+
   # # lib/riak_adapter.ex:1: warning: undefined behaviour function update/3 (for behaviour Ecto.Adapter)
   # def update(repo, model, opts) do
   #   {sql, params} = SQL.update(model)

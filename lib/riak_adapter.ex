@@ -27,6 +27,7 @@ defmodule RiakAdapter do
   @default_host "localhost"
   @default_port 8087
   @default_solr_port 8093
+  @default_search_schema "_yz_default"
   @timeout 5000
 
 
@@ -35,6 +36,21 @@ defmodule RiakAdapter do
     quote do
       def __riak__(:pool_name) do
         __MODULE__.Pool
+      end
+
+
+      def ping do
+        RiakAdapter.ping(__MODULE__)
+      end
+
+
+      def create_search_index(name) do
+        RiakAdapter.create_search_index(__MODULE__, name, @default_search_schema)
+      end
+
+
+      def create_search_index(name, schema, opts \\ []) do
+        RiakAdapter.create_search_index(__MODULE__, name, schema, opts)
       end
     end
   end

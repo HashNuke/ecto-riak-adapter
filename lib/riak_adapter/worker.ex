@@ -20,7 +20,7 @@ defmodule RiakAdapter.Worker do
   end
 
 
-  def create_search_index!(worker, name, schema, search_admin_opts, timeout) do
+  def create_search_index!(worker, name, schema, search_admin_opts, timeout \\ @timeout) do
     case :gen_server.call(worker, {:create_search_index, name, schema, search_admin_opts, timeout}, timeout) do
       :pong -> :pong
       {:error, %RiakAdapter.Error{} = err} -> raise err

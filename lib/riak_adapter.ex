@@ -29,7 +29,6 @@ defmodule RiakAdapter do
   @default_solr_port 8093
   @default_search_schema "_yz_default"
   @timeout 5000
-  @default_content_type "application/json"
 
 
   # lib/riak_adapter.ex:1: warning: undefined behaviour macro __using__/1 (for behaviour Ecto.Adapter)
@@ -126,39 +125,19 @@ defmodule RiakAdapter do
   # end
   #
 
+
   # lib/riak_adapter.ex:1: warning: undefined behaviour function insert/3 (for behaviour Ecto.Adapter)
   def insert(repo, model, opts) do
-    module      = model.__struct__
-    bucket_name = module.__schema__(:source)
-    key_values  = module.__schema__(:keywords, model)
-    primary_key_field = module.__schema__(:primary_key)
-    primary_key_value = key_values |> Keyword.get(:id)
-    model_data        = key_values |> Keyword.delete(primary_key_field)
+    pool = repo_pool(repo)
 
-    obj_key = case primary_key_value do
-      nil -> :undefined
-      _   -> primary_key_value
-    end
+    timeout = opts[:timeout] || @timeout
+    put_opts = Keyword.delete(opts, :timeout)
 
-    encoded_data = encode_data(model_data, @default_content_type)
-    {:ok, student} = :riakc_obj.new("students", obj_key, encoded_data, @default_content_type)
-
-    # pool = repo_pool(repo)
-    # timeout = opts[:timeout] || @timeout
-    # repo.log(:ping, fn ->
-    #   use_worker(pool, timeout, fn worker ->
-    #     Worker.query!(worker, sql, params, timeout)
-    #   end)
-    # end)
-
-
-    # {sql, params} = SQL.insert(model, returning)
-    # case query(repo, sql, params, opts) do
-    #   %Postgrex.Result{rows: [values]} ->
-    #     Enum.zip(returning, Tuple.to_list(values))
-    #   _ ->
-    #     []
-    # end
+    repo.log(:ping, fn ->
+      use_worker(pool, timeout, fn worker ->
+        Worker.insert!(worker, model, put_opts, timeout)
+      end)
+    end)
   end
   #
   #
@@ -359,10 +338,5 @@ defmodule RiakAdapter do
 
   def default_search_schema do
     @default_search_schema
-  end
-
-
-  defp encode_data(data, "application/json") do
-    Poison
   end
 end

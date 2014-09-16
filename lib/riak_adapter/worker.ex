@@ -28,6 +28,15 @@ defmodule RiakAdapter.Worker do
   end
 
 
+  def insert!(worker, model, opts, timeout \\ @timeout) do
+    case :gen_server.call(worker, {:insert, model, opts, timeout}, timeout) do
+      {:ok, model}  -> model
+      {:error, err} -> raise %RiakAdapter.Error{riak: err}
+    end
+  end
+
+
+
   def query!(worker, sql, params, timeout \\ @timeout) do
     case :gen_server.call(worker, {:query, sql, params, timeout}, timeout) do
       {:ok, res} -> res
@@ -80,6 +89,12 @@ defmodule RiakAdapter.Worker do
     {:reply, RiakAdapter.Connection.ping(conn, timeout), s}
   end
 
+
+  def handle_call({:insert, model, opts, timeout}, _from, %{conn: conn} = s) do
+    {:reply, RiakAdapter.Connection.insert(conn, model, opts, timeout), s}
+  end
+
+
   def handle_call({:query, sql, params, timeout}, _from, %{conn: conn} = s) do
     {:reply, RiakAdapter.Connection.query(conn, sql, params, timeout), s}
   end
@@ -117,4 +132,5 @@ defmodule RiakAdapter.Worker do
   defp new_state do
     %{conn: nil, params: nil, monitor: nil}
   end
+
 end

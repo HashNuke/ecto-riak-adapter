@@ -32,8 +32,11 @@ defmodule RiakAdapter.Connection do
     encoded_data   = encode_data(model_data, @default_content_type)
     object = :riakc_obj.new(bucket_name, obj_key, encoded_data, @default_content_type)
     case :riakc_pb_socket.put(pid, object, opts, timeout) do
-      :ok             -> {:ok, model}
-      {:ok, key}      -> {:ok, Map.put(model, primary_key_field, key)}
+      :ok ->
+        {:ok, model}
+      {:ok, return_obj} ->
+        key = get_key_from_obj(return_obj)
+        {:ok, Map.put(model, primary_key_field, key)}
       {:error, error} -> {:error, error}
     end
   end
@@ -49,6 +52,12 @@ defmodule RiakAdapter.Connection do
   end
 
   defp format_host(host), do: '#{host}'
+
+
+  defp get_key_from_obj(obj) do
+    {:riakc_obj, _bucket_name, key, _, _, _, _} = obj
+    key
+  end
 
 
   defp map_of_non_virtual_fields(model, primary_key_field) do

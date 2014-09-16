@@ -45,7 +45,7 @@ defmodule RiakAdapter do
 
 
       def create_search_index(name) do
-        RiakAdapter.create_search_index(__MODULE__, name, @default_search_schema)
+        RiakAdapter.create_search_index(__MODULE__, name, RiakAdapter.default_search_schema)
       end
 
 
@@ -338,5 +338,10 @@ defmodule RiakAdapter do
   #   end
   #   :ok
   # end
+
+
+  def default_search_schema do
+    @default_search_schema
+  end
 
 end

@@ -53,6 +53,12 @@ defmodule Ecto.Adapters.Riak do
         unquote(__MODULE__).create_search_index(__MODULE__, name, schema, opts)
       end
 
+
+      def custom(fun) do
+        unquote(__MODULE__).custom(__MODULE__, fun)
+      end
+
+
       #TODO list search indices
       #TODO list keys
       #TODO list buckets
@@ -106,6 +112,17 @@ defmodule Ecto.Adapters.Riak do
     repo.log(:ping, fn ->
       use_worker(pool, timeout, fn worker ->
         Worker.ping!(worker, timeout)
+      end)
+    end)
+  end
+
+
+  def custom(repo, fun) do
+    pool = repo_pool(repo)
+
+    repo.log(:ping, fn ->
+      use_worker(pool, @timeout, fn worker ->
+        fun.(worker)
       end)
     end)
   end

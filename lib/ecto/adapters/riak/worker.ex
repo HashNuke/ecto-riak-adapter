@@ -47,7 +47,7 @@ defmodule Ecto.Adapters.Riak.Worker do
 
 
   def run_custom!(worker, fun) do
-    :gen_server.call(worker, :run_custom, @timeout)
+    :gen_server.call(worker, {:run_custom, fun}, @timeout)
   end
 
 
@@ -100,7 +100,7 @@ defmodule Ecto.Adapters.Riak.Worker do
   end
 
 
-  def handle_call(:run_custom, _from, %{conn: conn} = s) do
+  def handle_call({:run_custom, fun}, _from, %{conn: conn} = s) do
     {:reply, Riak.Connection.run_custom(conn, fun), s}
   end
 

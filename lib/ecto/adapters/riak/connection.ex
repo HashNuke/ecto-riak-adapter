@@ -31,6 +31,11 @@ defmodule Ecto.Adapters.Riak.Connection do
   end
 
 
+  def run_custom(pid, fun) do
+    fun.(pid)
+  end
+
+
   defp put_object(pid, _action, model, opts, timeout) do
     module      = model.__struct__
     bucket_name = module.__schema__(:source)

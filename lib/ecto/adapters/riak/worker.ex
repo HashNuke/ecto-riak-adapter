@@ -46,6 +46,11 @@ defmodule Ecto.Adapters.Riak.Worker do
   end
 
 
+  def run_custom!(worker, fun) do
+    :gen_server.call(worker, :run_custom, @timeout)
+  end
+
+
   def query!(worker, sql, params, timeout \\ @timeout) do
     case :gen_server.call(worker, {:query, sql, params, timeout}, timeout) do
       {:ok, res} -> res
@@ -92,6 +97,11 @@ defmodule Ecto.Adapters.Riak.Worker do
 
   def handle_call({:create_search_index, name, schema, search_admin_opts}, _from, %{conn: conn} = s) do
     {:reply, Riak.Connection.create_search_index(conn, name, schema, search_admin_opts), s}
+  end
+
+
+  def handle_call(:run_custom, _from, %{conn: conn} = s) do
+    {:reply, Riak.Connection.run_custom(conn, fun), s}
   end
 
 

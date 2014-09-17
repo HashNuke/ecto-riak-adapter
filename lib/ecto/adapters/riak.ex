@@ -117,12 +117,12 @@ defmodule Ecto.Adapters.Riak do
   end
 
 
-  def custom(repo, fun) do
+  def run_custom(repo, fun) do
     pool = repo_pool(repo)
 
-    repo.log(:ping, fn ->
+    repo.log(:req, fn ->
       use_worker(pool, @timeout, fn worker ->
-        fun.(worker)
+        Worker.run_custom!(worker, fun)
       end)
     end)
   end

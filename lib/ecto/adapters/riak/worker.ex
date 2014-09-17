@@ -17,7 +17,7 @@ defmodule Ecto.Adapters.Riak.Worker do
   def ping!(worker, timeout \\ @timeout) do
     case :gen_server.call(worker, {:ping, timeout}, timeout) do
       :pong -> :pong
-      {:error, err} -> raise %Ecto.Adapters.Riak.Error{riak: err}
+      {:error, err} -> raise %Riak.Error{riak: err}
     end
   end
 
@@ -25,7 +25,7 @@ defmodule Ecto.Adapters.Riak.Worker do
   def create_search_index!(worker, name, schema, search_admin_opts, timeout \\ @timeout) do
     case :gen_server.call(worker, {:create_search_index, name, schema, search_admin_opts, timeout}, timeout) do
       :ok -> :ok
-      {:error, err} -> raise %Ecto.Adapters.Riak.Error{riak: err}
+      {:error, err} -> raise %Riak.Error{riak: err}
     end
   end
 
@@ -33,7 +33,7 @@ defmodule Ecto.Adapters.Riak.Worker do
   def insert!(worker, model, opts, timeout \\ @timeout) do
     case :gen_server.call(worker, {:insert, model, opts, timeout}, timeout) do
       {:ok, model}  -> model
-      {:error, err} -> raise %Ecto.Adapters.Riak.Error{riak: err}
+      {:error, err} -> raise %Riak.Error{riak: err}
     end
   end
 
@@ -42,7 +42,7 @@ defmodule Ecto.Adapters.Riak.Worker do
   def query!(worker, sql, params, timeout \\ @timeout) do
     case :gen_server.call(worker, {:query, sql, params, timeout}, timeout) do
       {:ok, res} -> res
-      {:error, %Ecto.Adapters.Riak.Error{} = err} -> raise err
+      {:error, %Riak.Error{} = err} -> raise err
     end
   end
 

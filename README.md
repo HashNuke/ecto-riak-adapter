@@ -1,4 +1,6 @@
-# RiakAdapter
+# Ecto.Adapters.Riak
+
+Project state: USELESS
 
 ** TODO: Add description **
 

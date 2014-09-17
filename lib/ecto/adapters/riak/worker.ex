@@ -38,6 +38,13 @@ defmodule Ecto.Adapters.Riak.Worker do
   end
 
 
+  def update!(worker, model, opts, timeout \\ @timeout) do
+    case :gen_server.call(worker, {:update, model, opts, timeout}, timeout) do
+      {:ok, model}  -> model
+      {:error, err} -> raise %Riak.Error{riak: err}
+    end
+  end
+
 
   def query!(worker, sql, params, timeout \\ @timeout) do
     case :gen_server.call(worker, {:query, sql, params, timeout}, timeout) do
@@ -45,6 +52,7 @@ defmodule Ecto.Adapters.Riak.Worker do
       {:error, %Riak.Error{} = err} -> raise err
     end
   end
+
 
   def monitor_me(worker) do
     :gen_server.cast(worker, {:monitor, self})
@@ -94,6 +102,11 @@ defmodule Ecto.Adapters.Riak.Worker do
 
   def handle_call({:insert, model, opts, timeout}, _from, %{conn: conn} = s) do
     {:reply, Riak.Connection.insert(conn, model, opts, timeout), s}
+  end
+
+
+  def handle_call({:update, model, opts, timeout}, _from, %{conn: conn} = s) do
+    {:reply, Riak.Connection.update(conn, model, opts, timeout), s}
   end
 
 

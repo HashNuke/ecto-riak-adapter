@@ -22,6 +22,16 @@ defmodule Ecto.Adapters.Riak.Connection do
 
 
   def insert(pid, model, opts, timeout) do
+    put_object(pid, :insert, model, opts, timeout)
+  end
+
+
+  def update(pid, model, opts, timeout) do
+    put_object(pid, :update, model, opts, timeout)
+  end
+
+
+  defp put_object(pid, _action, model, opts, timeout) do
     module      = model.__struct__
     bucket_name = module.__schema__(:source)
     primary_key_field = module.__schema__(:primary_key)

@@ -158,13 +158,20 @@ defmodule Ecto.Adapters.Riak do
 
 
   # # lib/riak_adapter.ex:1: warning: undefined behaviour function update/3 (for behaviour Ecto.Adapter)
-  # def update(repo, model, opts) do
-  #   {sql, params} = SQL.update(model)
-  #   %Postgrex.Result{num_rows: nrows} = query(repo, sql, params, opts)
-  #   nrows
-  # end
-  #
-  #
+  def update(repo, model, opts) do
+    pool = repo_pool(repo)
+
+    timeout = opts[:timeout] || @timeout
+    put_opts = Keyword.delete(opts, :timeout)
+
+    repo.log(:ping, fn ->
+      use_worker(pool, timeout, fn worker ->
+        Worker.update!(worker, model, put_opts, timeout)
+      end)
+    end)
+  end
+
+
   # # lib/riak_adapter.ex:1: warning: undefined behaviour function update_all/4 (for behaviour Ecto.Adapter)
   # def update_all(repo, query, values, external, opts) do
   #   {sql, params} = SQL.update_all(query, values, external)

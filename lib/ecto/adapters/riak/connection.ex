@@ -1,4 +1,4 @@
-defmodule RiakAdapter.Connection do
+defmodule Ecto.Adapters.Riak.Connection do
 
   @default_content_type "application/json"
 

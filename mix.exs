@@ -1,8 +1,8 @@
-defmodule RiakAdapter.Mixfile do
+defmodule EctoRiakAdapter.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :riak_adapter,
+    [app: :ecto_riak_adapter,
      version: "0.0.1",
      elixir: "~> 1.0.0",
      deps: deps]

@@ -1,6 +1,7 @@
 %{"decimal": {:package, "0.2.5"},
   "ecto": {:package, "0.2.4"},
   "meck": {:git, "git://github.com/basho/meck.git", "d4730c6d47e437b1dcd170551506e7b10596cd5a", [tag: "0.8.1p1"]},
+  "poison": {:git, "git://github.com/devinus/poison.git", "7d78c836fcd535f4277ab0a19903c18f04104e2d", []},
   "poolboy": {:package, "1.2.1"},
   "protobuffs": {:git, "git://github.com/basho/erlang_protobuffs.git", "5257dfe4e000b58487af89b849c7336ffa9bae82", [tag: "0.8.1p4"]},
   "riak_pb": {:git, "git://github.com/HashNuke/riak_pb.git", "cf2c1321521880719ae8ba8ba534cef173d8eba1", [branch: "plugin-fix-for-rebar-2.5.1"]},

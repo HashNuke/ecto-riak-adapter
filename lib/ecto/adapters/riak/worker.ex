@@ -1,5 +1,7 @@
-defmodule RiakAdapter.Worker do
+defmodule Ecto.Adapters.Riak.Worker do
   use GenServer
+
+  alias Ecto.Adapters.Riak
 
   @timeout 5000
 
@@ -15,7 +17,7 @@ defmodule RiakAdapter.Worker do
   def ping!(worker, timeout \\ @timeout) do
     case :gen_server.call(worker, {:ping, timeout}, timeout) do
       :pong -> :pong
-      {:error, err} -> raise %RiakAdapter.Error{riak: err}
+      {:error, err} -> raise %Ecto.Adapters.Riak.Error{riak: err}
     end
   end
 
@@ -23,7 +25,7 @@ defmodule RiakAdapter.Worker do
   def create_search_index!(worker, name, schema, search_admin_opts, timeout \\ @timeout) do
     case :gen_server.call(worker, {:create_search_index, name, schema, search_admin_opts, timeout}, timeout) do
       :ok -> :ok
-      {:error, err} -> raise %RiakAdapter.Error{riak: err}
+      {:error, err} -> raise %Ecto.Adapters.Riak.Error{riak: err}
     end
   end
 
@@ -31,7 +33,7 @@ defmodule RiakAdapter.Worker do
   def insert!(worker, model, opts, timeout \\ @timeout) do
     case :gen_server.call(worker, {:insert, model, opts, timeout}, timeout) do
       {:ok, model}  -> model
-      {:error, err} -> raise %RiakAdapter.Error{riak: err}
+      {:error, err} -> raise %Ecto.Adapters.Riak.Error{riak: err}
     end
   end
 
@@ -40,7 +42,7 @@ defmodule RiakAdapter.Worker do
   def query!(worker, sql, params, timeout \\ @timeout) do
     case :gen_server.call(worker, {:query, sql, params, timeout}, timeout) do
       {:ok, res} -> res
-      {:error, %RiakAdapter.Error{} = err} -> raise err
+      {:error, %Ecto.Adapters.Riak.Error{} = err} -> raise err
     end
   end
 
@@ -58,7 +60,7 @@ defmodule RiakAdapter.Worker do
     eager? = Keyword.get(opts, :lazy, true) in [false, "false"]
 
     if eager? do
-      case RiakAdapter.Connection.start_link(opts) do
+      case Riak.Connection.start_link(opts) do
         {:ok, conn} ->
           conn = conn
         _ ->
@@ -71,7 +73,7 @@ defmodule RiakAdapter.Worker do
 
   # Connection is disconnected, reconnect before continuing
   def handle_call(request, from, %{conn: nil, params: params} = s) do
-    case RiakAdapter.Connection.start_link(params) do
+    case Riak.Connection.start_link(params) do
       {:ok, conn} ->
         handle_call(request, from, %{s | conn: conn})
       {:error, err} ->
@@ -81,22 +83,22 @@ defmodule RiakAdapter.Worker do
 
 
   def handle_call({:create_search_index, name, schema, search_admin_opts, timeout}, _from, %{conn: conn} = s) do
-    {:reply, RiakAdapter.Connection.create_search_index(conn, name, schema, search_admin_opts), s}
+    {:reply, Riak.Connection.create_search_index(conn, name, schema, search_admin_opts), s}
   end
 
 
   def handle_call({:ping, timeout}, _from, %{conn: conn} = s) do
-    {:reply, RiakAdapter.Connection.ping(conn, timeout), s}
+    {:reply, Riak.Connection.ping(conn, timeout), s}
   end
 
 
   def handle_call({:insert, model, opts, timeout}, _from, %{conn: conn} = s) do
-    {:reply, RiakAdapter.Connection.insert(conn, model, opts, timeout), s}
+    {:reply, Riak.Connection.insert(conn, model, opts, timeout), s}
   end
 
 
   def handle_call({:query, sql, params, timeout}, _from, %{conn: conn} = s) do
-    {:reply, RiakAdapter.Connection.query(conn, sql, params, timeout), s}
+    {:reply, Riak.Connection.query(conn, sql, params, timeout), s}
   end
 
   def handle_cast({:monitor, pid}, %{monitor: nil} = s) do
@@ -126,7 +128,7 @@ defmodule RiakAdapter.Worker do
   end
 
   def terminate(_reason, %{conn: conn}) do
-    RiakAdapter.Connection.stop(conn)
+    Riak.Connection.stop(conn)
   end
 
   defp new_state do

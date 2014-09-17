@@ -1,4 +1,4 @@
-defmodule RiakAdapter.Error do
+defmodule Ecto.Adapters.Riak.Error do
   # We either use our own custom error message
   # OR we use what Riak gives us
   defexception [:message, :riak]

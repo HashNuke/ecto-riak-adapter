@@ -1,4 +1,4 @@
-defmodule RiakAdapter do
+defmodule Ecto.Adapters.Riak do
   @moduledoc """
   This is the adapter module for PostgreSQL. It handles and pools the
   connections to the postgres database with poolboy.
@@ -22,7 +22,7 @@ defmodule RiakAdapter do
   @behaviour Ecto.Adapter
   @behaviour Ecto.Adapter.Storage
   # @behaviour Ecto.Adapter.Transactions
-  alias RiakAdapter.Worker
+  alias Ecto.Adapters.Riak.Worker
 
   @default_host "localhost"
   @default_port 8087
@@ -40,17 +40,17 @@ defmodule RiakAdapter do
 
 
       def ping do
-        RiakAdapter.ping(__MODULE__)
+        unquote(__MODULE__).ping(__MODULE__)
       end
 
 
       def create_search_index(name) do
-        RiakAdapter.create_search_index(__MODULE__, name, RiakAdapter.default_search_schema)
+        unquote(__MODULE__).create_search_index(__MODULE__, name, unquote(__MODULE__).default_search_schema)
       end
 
 
       def create_search_index(name, schema, opts \\ []) do
-        RiakAdapter.create_search_index(__MODULE__, name, schema, opts)
+        unquote(__MODULE__).create_search_index(__MODULE__, name, schema, opts)
       end
 
       #TODO list search indices
@@ -280,7 +280,7 @@ defmodule RiakAdapter do
 
     pool_opts = [
       name: {:local, pool_name},
-      worker_module: RiakAdapter.Worker ] ++ pool_opts
+      worker_module: Worker ] ++ pool_opts
 
     # TODO accomodate riakc options
     worker_opts = worker_opts

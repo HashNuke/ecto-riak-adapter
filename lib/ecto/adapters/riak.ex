@@ -54,8 +54,8 @@ defmodule Ecto.Adapters.Riak do
       end
 
 
-      def custom(fun) do
-        unquote(__MODULE__).custom(__MODULE__, fun)
+      def run_custom(fun) do
+        unquote(__MODULE__).run_custom(__MODULE__, fun)
       end
 
 

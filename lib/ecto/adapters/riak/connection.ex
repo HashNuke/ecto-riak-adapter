@@ -21,13 +21,13 @@ defmodule Ecto.Adapters.Riak.Connection do
   end
 
 
-  def insert(pid, model, opts, timeout) do
-    put_object(pid, :insert, model, opts, timeout)
+  def insert(pid, bucket, model, opts, timeout) do
+    put_object(pid, :insert, bucket, model, opts, timeout)
   end
 
 
-  def update(pid, model, opts, timeout) do
-    put_object(pid, :update, model, opts, timeout)
+  def update(pid, bucket, model, opts, timeout) do
+    put_object(pid, :update, bucket, model, opts, timeout)
   end
 
 
@@ -36,16 +36,15 @@ defmodule Ecto.Adapters.Riak.Connection do
   end
 
 
-  defp put_object(pid, _action, model, opts, timeout) do
+  defp put_object(pid, _action, bucket, model, opts, timeout) do
     module      = model.__struct__
-    bucket_name = module.__schema__(:source)
     primary_key_field = module.__schema__(:primary_key)
 
     obj_key    = Ecto.Model.primary_key(model) || :undefined
     model_data = map_of_non_virtual_fields(model, primary_key_field)
 
     encoded_data = encode_data(model_data, @default_content_type)
-    object = :riakc_obj.new(bucket_name, obj_key, encoded_data, @default_content_type)
+    object = :riakc_obj.new(bucket, obj_key, encoded_data, @default_content_type)
     case :riakc_pb_socket.put(pid, object, opts, timeout) do
       :ok ->
         return_values = module.__schema__(:keywords, model)

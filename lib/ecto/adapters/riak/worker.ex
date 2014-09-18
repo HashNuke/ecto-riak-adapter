@@ -30,16 +30,16 @@ defmodule Ecto.Adapters.Riak.Worker do
   end
 
 
-  def insert!(worker, model, opts, timeout \\ @timeout) do
-    case :gen_server.call(worker, {:insert, model, opts, timeout}, timeout) do
+  def insert!(worker, bucket, model, opts, timeout \\ @timeout) do
+    case :gen_server.call(worker, {:insert, bucket, model, opts, timeout}, timeout) do
       {:ok, model}  -> model
       {:error, err} -> raise %Riak.Error{riak: err}
     end
   end
 
 
-  def update!(worker, model, opts, timeout \\ @timeout) do
-    case :gen_server.call(worker, {:update, model, opts, timeout}, timeout) do
+  def update!(worker, bucket, model, opts, timeout \\ @timeout) do
+    case :gen_server.call(worker, {:update, bucket, model, opts, timeout}, timeout) do
       {:ok, model}  -> model
       {:error, err} -> raise %Riak.Error{riak: err}
     end
@@ -110,13 +110,13 @@ defmodule Ecto.Adapters.Riak.Worker do
   end
 
 
-  def handle_call({:insert, model, opts, timeout}, _from, %{conn: conn} = s) do
-    {:reply, Riak.Connection.insert(conn, model, opts, timeout), s}
+  def handle_call({:insert, bucket, model, opts, timeout}, _from, %{conn: conn} = s) do
+    {:reply, Riak.Connection.insert(conn, bucket, model, opts, timeout), s}
   end
 
 
-  def handle_call({:update, model, opts, timeout}, _from, %{conn: conn} = s) do
-    {:reply, Riak.Connection.update(conn, model, opts, timeout), s}
+  def handle_call({:update, bucket, model, opts, timeout}, _from, %{conn: conn} = s) do
+    {:reply, Riak.Connection.update(conn, bucket, model, opts, timeout), s}
   end
 
 

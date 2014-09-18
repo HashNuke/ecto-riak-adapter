@@ -59,6 +59,11 @@ defmodule Ecto.Adapters.Riak do
       end
 
 
+      def default_bucket_type do
+        __MODULE__.conf[:bucket_type] || Mix.Project.config[:app]
+      end
+
+
       #TODO list search indices
       #TODO list keys
       #TODO list buckets
@@ -160,15 +165,32 @@ defmodule Ecto.Adapters.Riak do
   #
 
 
-  def insert(repo, model, opts) do
-    pool = repo_pool(repo)
+  defp bucket_for(_repo, {:default, bucket_name}) do
+    bucket_name
+  end
 
-    timeout = opts[:timeout] || @timeout
+  defp bucket_for(_repo, {bucket_type, bucket_name}) do
+    {bucket_type, bucket_name}
+  end
+
+  defp bucket_for(repo, bucket) when is_binary(bucket) do
+    case repo.default_bucket_type do
+      :default    -> bucket
+      bucket_type -> {bucket_type, bucket} 
+    end
+  end
+
+
+  def insert(repo, model, opts) do
+    pool   = repo_pool(repo)
+    bucket = bucket_for repo, model.__struct__.__schema__(:source)
+
+    timeout  = opts[:timeout] || @timeout
     put_opts = Keyword.delete(opts, :timeout)
 
     repo.log(:ping, fn ->
       use_worker(pool, timeout, fn worker ->
-        Worker.insert!(worker, model, put_opts, timeout)
+        Worker.insert!(worker, bucket, model, put_opts, timeout)
       end)
     end)
   end
@@ -177,13 +199,14 @@ defmodule Ecto.Adapters.Riak do
   # # lib/riak_adapter.ex:1: warning: undefined behaviour function update/3 (for behaviour Ecto.Adapter)
   def update(repo, model, opts) do
     pool = repo_pool(repo)
+    bucket = bucket_for repo, model.__struct__.__schema__(:source)
 
-    timeout = opts[:timeout] || @timeout
+    timeout  = opts[:timeout] || @timeout
     put_opts = Keyword.delete(opts, :timeout)
 
     repo.log(:ping, fn ->
       use_worker(pool, timeout, fn worker ->
-        Worker.update!(worker, model, put_opts, timeout)
+        Worker.update!(worker, bucket, model, put_opts, timeout)
       end)
     end)
   end
@@ -306,11 +329,18 @@ defmodule Ecto.Adapters.Riak do
       name: {:local, pool_name},
       worker_module: Worker ] ++ pool_opts
 
-    # TODO accomodate riakc options
-    worker_opts = worker_opts
-      |> Keyword.put_new(:port, @default_port)
-
+    worker_opts = build_riakc_opts(worker_opts)
     {pool_opts, worker_opts}
+  end
+
+
+  defp build_riakc_opts(opts) do
+    unless opts[:port] do
+      Keyword.put_new(opts, :port, @default_port)
+    else
+      opts
+    end
+    |> Keyword.delete(:bucket_type)
   end
 
 

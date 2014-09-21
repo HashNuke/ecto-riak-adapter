@@ -84,7 +84,7 @@ defmodule Ecto.Adapters.Riak.Connection do
     |> Dict.delete(primary_key_field)
 
     map_fields = Enum.reduce module.__schema__(:field_names), %{}, fn(field_name, acc)->
-      case Regex.match?(~r/(.+)_map/, field_name) && !Dict.has_key?(non_virtual_fields, field_name) do
+      case Regex.match?(~r/(.+)_map/, "#{field_name}") && !Dict.has_key?(non_virtual_fields, field_name) do
         true  -> add_map_field(model, field_name, acc)
         false -> acc
       end
@@ -97,8 +97,10 @@ defmodule Ecto.Adapters.Riak.Connection do
 
   def add_map_field(model, field_name, data) do
     real_field_name = String.replace(field_name, ~r/_map$/, "")
-    value = Map.get model, field_name
-    Map.put(data, real_field_name, value)
+    case Map.get(model, field_name) do
+      nil   -> data
+      value -> Map.put(data, real_field_name, value)
+    end
   end
 
 

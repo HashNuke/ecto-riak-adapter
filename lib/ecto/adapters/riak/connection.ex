@@ -90,7 +90,7 @@ defmodule Ecto.Adapters.Riak.Connection do
       end
     end
 
-    Map.from_list(non_virtual_fields)
+    :maps.from_list(non_virtual_fields)
     |> Map.merge(map_fields)
   end
 

@@ -41,7 +41,7 @@ defmodule Ecto.Adapters.Riak.Connection do
     primary_key_field = module.__schema__(:primary_key)
 
     obj_key    = Ecto.Model.primary_key(model) || :undefined
-    model_data = map_of_non_virtual_fields(model, primary_key_field)
+    model_data = fields(model, primary_key_field)
 
     encoded_data = encode_data(model_data, @default_content_type)
     object = :riakc_obj.new(bucket, obj_key, encoded_data, @default_content_type)
@@ -78,14 +78,27 @@ defmodule Ecto.Adapters.Riak.Connection do
   end
 
 
-  defp map_of_non_virtual_fields(model, primary_key_field) do
+  defp fields(model, primary_key_field) do
     module = model.__struct__
-    non_virtual_field_keys = module.__schema__(:keywords, model)
-    |> Keyword.keys
-    |> List.delete(primary_key_field)
+    non_virtual_fields = module.__schema__(:keywords, model)
+    |> Dict.delete(primary_key_field)
 
-    Map.from_struct(model)
-    |> Map.take(non_virtual_field_keys)
+    map_fields = Enum.reduce module.__schema__(:field_names), %{}, fn(field_name, acc)->
+      case Regex.match?(~r/(.+)_map/, field_name) && !Dict.has_key?(non_virtual_fields, field_name) do
+        true  -> add_map_field(model, field_name, acc)
+        false -> acc
+      end
+    end
+
+    Map.from_list(non_virtual_fields)
+    |> Map.merge(map_fields)
+  end
+
+
+  def add_map_field(model, field_name, data) do
+    real_field_name = String.replace(field_name, ~r/_map$/, "")
+    value = Map.get model, field_name
+    Map.put(data, real_field_name, value)
   end
 
 

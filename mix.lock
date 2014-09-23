@@ -1,8 +1,8 @@
 %{"decimal": {:package, "0.2.5"},
   "ecto": {:package, "0.2.4"},
-  "meck": {:git, "git://github.com/basho/meck.git", "d4730c6d47e437b1dcd170551506e7b10596cd5a", [tag: "0.8.1p1"]},
+  "meck": {:git, "https://github.com/eproxus/meck", "b1f313b4cecc3df05a477a93641bf0a24d858590", [branch: "master"]},
   "poison": {:git, "git://github.com/devinus/poison.git", "7d78c836fcd535f4277ab0a19903c18f04104e2d", []},
   "poolboy": {:package, "1.2.1"},
-  "protobuffs": {:git, "git://github.com/basho/erlang_protobuffs.git", "5257dfe4e000b58487af89b849c7336ffa9bae82", [tag: "0.8.1p4"]},
-  "riak_pb": {:git, "git://github.com/HashNuke/riak_pb.git", "cf2c1321521880719ae8ba8ba534cef173d8eba1", [branch: "plugin-fix-for-rebar-2.5.1"]},
+  "protobuffs": {:git, "git://github.com/basho/erlang_protobuffs.git", "f90e025518bdfbe48d6303c6aa5101297c56fb7b", [tag: "0.8.1"]},
+  "riak_pb": {:git, "git://github.com/basho/riak_pb.git", "792acbc07a2daddfc435a00ea037b90bbd0f424b", []},
   "riakc": {:git, "git://github.com/basho/riak-erlang-client.git", "6771318208acc9afc61a918194dcd450e5e8cc7d", []}}

@@ -54,6 +54,11 @@ defmodule Ecto.Adapters.Riak do
       end
 
 
+      def delete_search_index(name, schema, opts \\ []) do
+        unquote(__MODULE__).delete_search_index(__MODULE__, name, schema, opts)
+      end
+
+
       def run_custom(fun) do
         unquote(__MODULE__).run_custom(__MODULE__, fun)
       end
@@ -176,7 +181,7 @@ defmodule Ecto.Adapters.Riak do
   defp bucket_for(repo, bucket) when is_binary(bucket) do
     case repo.default_bucket_type do
       :default    -> bucket
-      bucket_type -> {bucket_type, bucket} 
+      bucket_type -> {bucket_type, bucket}
     end
   end
 

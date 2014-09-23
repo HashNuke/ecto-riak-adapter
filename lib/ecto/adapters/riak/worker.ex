@@ -30,6 +30,14 @@ defmodule Ecto.Adapters.Riak.Worker do
   end
 
 
+  def delete_search_index!(worker, name, schema, search_admin_opts, timeout \\ @timeout) do
+    case :gen_server.call(worker, {:delete_search_index, name, schema, search_admin_opts}, timeout) do
+      :ok -> :ok
+      {:error, err} -> raise %Riak.Error{riak: err}
+    end
+  end
+
+
   def insert!(worker, bucket, model, opts, timeout \\ @timeout) do
     case :gen_server.call(worker, {:insert, bucket, model, opts, timeout}, timeout) do
       {:ok, model}  -> model
@@ -97,6 +105,11 @@ defmodule Ecto.Adapters.Riak.Worker do
 
   def handle_call({:create_search_index, name, schema, search_admin_opts}, _from, %{conn: conn} = s) do
     {:reply, Riak.Connection.create_search_index(conn, name, schema, search_admin_opts), s}
+  end
+
+
+  def handle_call({:delete_search_index, name, schema, search_admin_opts}, _from, %{conn: conn} = s) do
+    {:reply, Riak.Connection.delete_search_index(conn, name, schema, search_admin_opts), s}
   end
 
 

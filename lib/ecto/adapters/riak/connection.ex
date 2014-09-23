@@ -21,6 +21,11 @@ defmodule Ecto.Adapters.Riak.Connection do
   end
 
 
+  def delete_search_index(pid, name, schema, options) do
+    :riakc_pb_socket.delete_search_index(pid, name, schema, options)
+  end
+
+
   def insert(pid, bucket, model, opts, timeout) do
     put_object(pid, :insert, bucket, model, opts, timeout)
   end
